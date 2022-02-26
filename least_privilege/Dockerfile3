@@ -1,0 +1,9 @@
+FROM golang:alpine
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup -h /home/appuser
+COPY app.go /app/app.go
+RUN chown appuser:appgroup /app
+WORKDIR /app
+USER appuser
+RUN CGO_ENABLED=0 go build app.go
+
+ENTRYPOINT /app/app

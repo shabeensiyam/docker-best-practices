@@ -1,0 +1,15 @@
+FROM golang:alpine
+RUN addgroup -S appgroup \
+    && adduser -S appadmin -G appgroup -h /home/appadmin \
+    && adduser -S appuser -G appgroup -h /home/appuser
+COPY app.go /app/app.go
+RUN chown -R appadmin:appgroup /app
+
+USER appadmin
+WORKDIR /app
+RUN CGO_ENABLED=0 go build app.go
+#RUN touch access.log && chmod g+rw access.log
+
+USER appuser
+
+ENTRYPOINT /app/app

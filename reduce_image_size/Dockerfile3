@@ -1,0 +1,10 @@
+###########################################################################
+FROM golang:bullseye AS golang_build
+ARG DEBIAN_FRONTEND=noninteractive
+COPY ./app.go .
+RUN CGO_ENABLED=0 go build app.go
+
+###########################################################################
+FROM alpine AS runtime
+COPY --from=golang_build /go/app /app
+ENTRYPOINT /app

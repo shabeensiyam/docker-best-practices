@@ -1,0 +1,36 @@
+###########################################################################
+FROM python:3.9-slim-bullseye AS python_base
+
+ENV DEBIAN_FRONTEND noninteractive
+
+ENV PYROOT /pyroot
+ENV PYTHONUSERBASE $PYROOT
+ENV PATH $PYROOT/bin:$PATH
+
+###########################################################################
+FROM python_base AS python_build
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends sqlitebrowser \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+RUN pip3 install --user pipenv
+
+COPY ./python_app /python_app
+WORKDIR /python_app
+RUN PIPENV_VENV_IN_PROJECT=1 pipenv install
+
+###########################################################################
+FROM python_base AS python_runtime
+
+## Copy all required pip packages for host and application
+COPY --from=python_build $PYROOT $PYROOT
+## Copy pipenv libs for Apps
+COPY --from=python_build /python_app /python_app
+
+WORKDIR /python_app
+
+EXPOSE 8000
+
+ENTRYPOINT pipenv run python3 manage.py runserver 0.0.0.0:8000

@@ -1,0 +1,5 @@
+FROM ubuntu:20.04
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update
+RUN apt-get install -y golang-go=2:1.13~1ubuntu2 ssh vim
+COPY app.go .

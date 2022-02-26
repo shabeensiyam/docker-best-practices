@@ -1,0 +1,5 @@
+FROM debian
+RUN apt update
+COPY app.go .
+RUN CGO_ENABLED=0 go build app.go
+CMD ["./app"]
