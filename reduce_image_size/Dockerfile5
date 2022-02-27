@@ -24,12 +24,12 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install
 ###########################################################################
 FROM python_base AS python_runtime
 
+WORKDIR /python_app
+
 ## Copy all required pip packages for host and application
 COPY --from=python_build $PYROOT $PYROOT
 ## Copy pipenv libs for Apps
 COPY --from=python_build /python_app /python_app
-
-WORKDIR /python_app
 
 EXPOSE 8000
 
