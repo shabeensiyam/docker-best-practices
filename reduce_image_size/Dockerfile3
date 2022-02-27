@@ -1,10 +1,25 @@
-###########################################################################
-FROM golang:bullseye AS golang_build
-ARG DEBIAN_FRONTEND=noninteractive
-COPY ./app.go .
-RUN CGO_ENABLED=0 go build app.go
+FROM ubuntu:18.04
 
-###########################################################################
-FROM alpine AS runtime
-COPY --from=golang_build /go/app /app
-ENTRYPOINT /app
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+## Install Python
+# update and software-properties-common are prereequisite
+# deadsnakes is needed for installing via apt-get followed by update
+# python3.9-distutils is needed otherwise virtual env from 3.6 will be called and pipenv will fail to create virtual env
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends python3.9 python3.9-distutils python3-pip sqlitebrowser && \
+    pip3 install pipenv &&\
+    rm -rf /var/lib/apt/lists/* &&\
+    apt-get clean &&\
+    pip3 install --user pipenv
+
+COPY ./python_app /python_app
+
+WORKDIR /python_app
+RUN PIPENV_VENV_IN_PROJECT=1 pipenv install
+
+ENTRYPOINT pipenv run python3 manage.py runserver 0.0.0.0:8000
