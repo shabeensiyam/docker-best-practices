@@ -17,7 +17,7 @@ func main () {
         panic(err)
     }
 
-    logFile, err = os.OpenFile("access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+    logFile, err = os.OpenFile("/app/log/access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
         panic(err)
     } else {

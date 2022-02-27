@@ -1,7 +1,9 @@
 FROM golang:alpine
+
 RUN addgroup -S appgroup \
     && adduser -S appadmin -G appgroup -h /home/appadmin \
     && adduser -S appuser -G appgroup -h /home/appuser
+
 COPY app.go /app/app.go
 RUN chown -R appadmin:appgroup /app
 RUN chmod a-w /etc
@@ -9,6 +11,7 @@ RUN chmod a-w /etc
 USER appadmin
 WORKDIR /app
 RUN CGO_ENABLED=0 go build app.go
+RUN mkdir log && chmod g+rwx log
 
 USER appuser
 

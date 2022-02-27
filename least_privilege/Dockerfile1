@@ -1,5 +1,5 @@
-FROM debian
-RUN apt update
+FROM golang:alpine
+RUN mkdir -p /app/log
 COPY app.go .
 RUN CGO_ENABLED=0 go build app.go
 CMD ["./app"]
